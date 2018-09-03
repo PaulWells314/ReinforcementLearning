@@ -36,26 +36,27 @@ def next_state(pos, vel, action):
     return (next_pos, next_vel)
     
     
-def dumpV(V):
+def dump_v(V):
     """ Dump Value matrix"""
     for pos in range(NUM_POS):
         for vel in range(NUM_VEL):
             if V[pos,vel] != 0.0:
                 print("pos ", pos, " vel ", vel, " V ", V[pos,vel])
-                    
-def main():
 
-    V = np.zeros( (NUM_POS, NUM_VEL) )
-    VTemp = np.zeros( (NUM_POS, NUM_VEL) )
+def generate_reward_matrix():
     R = np.zeros( (NUM_POS, NUM_VEL) ) 
     R[1:, :] =  0
-   
     
     # Land as softly as possible
     for v in range(NUM_VEL):
         R[0, v] =  5 * (v - ZERO_VEL)
+    return R
     
+def generate_value_matrix(R):
     # Generate Value matrix by iteration over Bellman equations
+    
+    V = np.zeros( (NUM_POS, NUM_VEL) )
+    VTemp = np.zeros( (NUM_POS, NUM_VEL) )
     for epoch in range(NUM_TRIALS):
         pos = NUM_POS -1
         vel = ZERO_VEL
@@ -75,14 +76,18 @@ def main():
                         best_pos = test_pos
                         best_V = V[test_pos, test_vel]
                    
-                        
+                #Bellman equation    
                 VTemp[pos, vel] = R[pos, vel] + DISCOUNT_FACTOR * best_V
         V = VTemp
-        #print("iteration ", epoch) 
-        #dumpV(V)
-        #print("")
-        
-    # Determine best path from given position
+    return V
+    
+def main():
+
+    R = generate_reward_matrix()
+    V = generate_value_matrix(R)
+     
+    # Determine best path 
+    
     pos = NUM_POS - 1
     vel = ZERO_VEL
     best_V = -10000
