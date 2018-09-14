@@ -1,9 +1,9 @@
 """
 Lunar Lander: An example of Reinforcement Learning by solving Bellman equations.
 """
-
 import numpy as np
 from enum import Enum
+import matplotlib.pyplot as plt
 
 class Action(Enum):
     ACTION_NONE = 1  # free-fall
@@ -94,7 +94,8 @@ def next_state(pos, vel, action):
    
     print("next state action ", action)
     if action == Action.ACTION_BURN:
-        acc = 2
+        i= np.random.randint(1, 3)
+        acc = i
         print("Burn")
     else:
         acc = -1
@@ -103,22 +104,34 @@ def next_state(pos, vel, action):
    
     return (next_pos, next_vel)
     
-def main():
 
-    r = generate_r()
-    q = generate_q()
-    
-    for i in range(1000):
-        s = (NUM_POS - 1, ZERO_VEL)
-        a = Action.ACTION_NONE
-        while s[0] != -1:
-            (s, q) = update_q(s, a, r, q)
-            a    = next_state_action(s, a, q)
-            print("next action ", a)
-    for i in range(NUM_POS):
-        for j in range(NUM_VEL):
-            for a  in Action:
-                print(i, j, get_action_index(a), q[i, j, get_action_index(a)])
-         
-     
-main()
+print("start")
+r = generate_r()
+q = generate_q()
+
+z = []
+v = []
+
+for i in range(1000):
+    s = (NUM_POS - 1, ZERO_VEL)
+    a = Action.ACTION_NONE
+    while s[0] != -1:
+        (s, q) = update_q(s, a, r, q)
+        a    = next_state_action(s, a, q)
+        print("next action ", a)
+for i in range(NUM_POS):
+    for j in range(NUM_VEL):
+        for a  in Action:
+            print(i, j, get_action_index(a), q[i, j, get_action_index(a)])
+            if q[i, j, get_action_index(a)] >= 0:
+                z.append(i)
+                v.append(j)
+            
+
+plt.plot(v, z, 'ro')
+plt.title('Q values >= 0')
+plt.xlabel('velocity (16 = zero)')
+plt.ylabel('height')
+plt.show()          
+            
+                
